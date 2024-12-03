@@ -107,8 +107,8 @@ function resolveCollision(ball1, ball2) {
 function getBallAbsolutePosition() {
     ball = balls[0];
     const rect = canvas.getBoundingClientRect(); // Canvas position relative to the page
-    const absoluteX = rect.left + ball.x + ballRadius; // Add ball.x to canvas's left offset
-    const absoluteY = rect.top + ball.y + ballRadius;  // Add ball.y to canvas's top offset
+    const absoluteX = rect.left + ball.x + ballRadius / 2; // Add ball.x to canvas's left offset
+    const absoluteY = rect.top + ball.y + ballRadius / 2;  // Add ball.y to canvas's top offset
     return { x: absoluteX, y: absoluteY };
 }
 
@@ -175,14 +175,14 @@ function areBallsNotMoving() {
 }
 
 function mouse_position() {
-    mousePosX = 0;
-    mousePosY = 0;
+    var mousePosX = 0;
+    var mousePosY = 0;
 
     mouseClickX = 0;
     mouseClickY = 0;
 
     triangle = document.getElementById('triangle');
-    triangle.style.visibility = "visible";
+    
     
 
     // Move ball position to center of ball /currently at top left
@@ -191,16 +191,39 @@ function mouse_position() {
     ctx.fillStyle = "white";
     ctx.fillText(`Ball Absolute Position: (${Math.round(absBallPos.x)}, ${Math.round(absBallPos.y)})`, 10, 20);
 
-    document.addEventListener('mousemove', (event) => {
+    document.addEventListener('mousemove', (event) => {//
         mousePosX = event.clientX;
         mousePosY = event.clientY;
         console.log(`Cursor position: X=${mousePosX}, Y=${mousePosY}`);
+        //console.log((mousePosY - absBallPos.y) / (MousePosX - absBallPos.x));//
 
-        scaleValue = Math.abs(absBallPos.x - mousePosX) * 0.4;
-        triangle.style.borderBottom = scaleValue + "px solid white";
-        triangle.style.top = ((absBallPos.y + mousePosY) / 2) + "px";
-        triangle.style.left = ((absBallPos.x + mousePosX) / 2) + "px";
-        triangle.style.transform = "rotate(" + Math.atan((mousePosY - absBallPos.y) / (MousePosX - absBallPos.x)) + "deg)";
+        deltaX = mousePosX - absBallPos.x;
+        deltaY = mousePosY - absBallPos.y;
+        
+
+        scaleValue = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2), 2) * 0.5;
+        triangle.style.visibility = "visible";
+        triangle.style.borderBottom = `${scaleValue}px solid white`;
+        triangle.style.top = (((absBallPos.y + mousePosY) / 2 - 1 * deltaY)) + "px";
+        triangle.style.left = ((absBallPos.x + mousePosX) / 2 - 1 * deltaX) + "px";
+
+        /*
+        
+        radian = Math.atan((absBallPos.y - mousePosY) / (mousePosX - absBallPos.x)) + Math.PI / 2;
+
+        console.log(radian);
+        if (absBallPos.x > mousePosX) {
+            radian = Math.Pi + radian;
+            triangle.style.transform = "rotate(-" + radian + "rad)";
+        } else {
+            triangle.style.transform = "rotate(" + radian + "rad)";
+        }*/
+        deltaX = mousePosX - absBallPos.x;
+        deltaY = mousePosY - absBallPos.y;
+        const radian = Math.atan2(deltaY, deltaX) + Math.PI / 2 + Math.PI; // Angle pointing to cursor
+
+        triangle.style.transform = `rotate(${radian}rad)`;
+        
     });
 
     //triangle.style.left = absBallPos.x + "px";
@@ -218,8 +241,15 @@ function mouse_position() {
 
         const ball = balls[0];
 
-        ball.dx = -((mouseClickX - absBallPos.x) / 100);
-        ball.dy = -((mouseClickY - absBallPos.y) / 100);
+        ball.dx = -((mouseClickX - absBallPos.x) / 10);
+        ball.dy = -((mouseClickY - absBallPos.y) / 10);
+
+        if (ball.dx > 15) {
+            ball.dx = 15;
+        }
+        if (ball.dy > 15) {
+            ball.dy = 15;
+        }
 
         if (mouseClickX < absBallPos.x) {
             //ball.dx *=  -1;
