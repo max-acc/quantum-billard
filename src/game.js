@@ -9,10 +9,13 @@ const tableWidth = canvas.width;
 const tableHeight = canvas.height;
 const centerHeight = tableHeight / 2;
 
+var whiteBallInGame = true;
+
 // Ball Parameters
 const ballRadius = 10;
+const whiteBall = { x: 100, y: centerHeight, dx: 0, dy: 0, color: "white" };
 const balls = [
-    { x: 100, y: centerHeight, dx: 0, dy: 0, color: "white" },
+    whiteBall,
     { x: 150, y: 220, dx: 0, dy: 0, color: "black" },
     { x: 160, y: 240, dx: 0, dy: 0, color: "green" },
     { x: 190, y: 290, dx: 0, dy: 0, color: "orange" },
@@ -44,6 +47,18 @@ function drawTable() {
 
 // Draw the Balls
 function drawBalls() {
+    if (whiteBallInGame == false && areBallsNotMoving()) {
+        balls.unshift(whiteBall);
+        console.log("add wihte ball");
+        console.log(balls);
+        whiteBallInGame = true;
+        balls[0].dx = 0;
+        balls[0].dy = 0;
+        balls[0].x = 100;
+        balls[0].y = centerHeight;
+        balls[0].color = "white";
+    }
+
     balls.forEach(ball => {
         ctx.beginPath();
         ctx.arc(ball.x, ball.y, ballRadius, 0, Math.PI * 2);
@@ -146,7 +161,11 @@ function moveBalls() {
             const distance = Math.hypot(pocket.x - ball.x, pocket.y - ball.y);
             if (distance < 15) {
                 console.log(`Ball pocketed: ${ball.color}`);
-                balls.splice(i, 1); // Remove the ball from the game
+                if (ball.color == "white") {
+                    whiteBallInGame = false;
+                }
+                balls.splice(i, 1); // Remove the ball from the game   
+                console.log(balls);             
             }
         });
     }
@@ -165,13 +184,20 @@ function moveBalls() {
 }
 
 function areBallsNotMoving() {
+    tempDx = 0;
+    tempDy = 0;
     for (let i = 0; i < balls.length; i++) {
         const ball = balls[i];
-        if (ball.dx != 0 || ball.dy != 0) {
-            return false;
-        }
+        tempDx += ball.dx;
+        tempDy += ball.dy;
     }
-    return true;
+    if (tempDx == 0 && tempDy == 0) {
+        console.log("true");
+        return true;
+    } else {
+        console.log("false");
+        return false;
+    }
 }
 
 function mouse_position() {
@@ -189,12 +215,12 @@ function mouse_position() {
     absBallPos = getBallAbsolutePosition();
     ctx.font = "16px Arial";
     ctx.fillStyle = "white";
-    ctx.fillText(`Ball Absolute Position: (${Math.round(absBallPos.x)}, ${Math.round(absBallPos.y)})`, 10, 20);
+    //ctx.fillText(`Ball Absolute Position: (${Math.round(absBallPos.x)}, ${Math.round(absBallPos.y)})`, 10, 20);
 
     document.addEventListener('mousemove', (event) => {//
         mousePosX = event.clientX;
         mousePosY = event.clientY;
-        console.log(`Cursor position: X=${mousePosX}, Y=${mousePosY}`);
+        //console.log(`Cursor position: X=${mousePosX}, Y=${mousePosY}`);
         //console.log((mousePosY - absBallPos.y) / (MousePosX - absBallPos.x));//
 
         deltaX = mousePosX - absBallPos.x;
@@ -202,8 +228,12 @@ function mouse_position() {
         
 
         scaleValue = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2), 2) * 0.5;
-        triangle.style.visibility = "visible";
-        triangle.style.borderBottom = `${scaleValue}px solid white`;
+        if (areBallsNotMoving()) {
+            triangle.style.visibility = "visible";
+        } else {
+            triangle.style.visibility = "hidden";
+        }
+        
         triangle.style.top = (((absBallPos.y + mousePosY) / 2 - 1 * deltaY)) + "px";
         triangle.style.left = ((absBallPos.x + mousePosX) / 2 - 1 * deltaX) + "px";
 
@@ -235,7 +265,7 @@ function mouse_position() {
         mouseClickX = event.clientX;
         mouseClickY = event.clientY;
     
-        console.log(`Cursor clicked at: X=${mouseClickX}, Y=${mouseClickY}`);
+        //console.log(`Cursor clicked at: X=${mouseClickX}, Y=${mouseClickY}`);
 
         triangle.style.visibility = "hidden";
 
@@ -259,8 +289,7 @@ function mouse_position() {
             //ball.dx *=  -1;
         } else {
 
-        }
-        
+        }        
     });
 
     
@@ -287,11 +316,7 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
     if (areBallsNotMoving()) {
         mouse_position();
-
-    }
-    
-
-    
+    }    
 }
 
 // Start the Game
