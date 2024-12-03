@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billiard Game</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #0a0a0a;
+        }
+        canvas {
+            border: 10px solid #4CAF50;
+            background-color: #228B22;
+            display: block;
+        }
+        .triangle {
+            position: absolute;
+            visibility: hidden; 
+            /*transform: scaleY(1);*/
+            transform: rotate(0deg);
+            width: 0;
+            height: 0;
+            top: 100;
+            left: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 10px solid white;
+            /*transition: all 0.3s ease;*/            
+        }
+        /* Scaling the triangle vertically */
+        .scaled {
+            /*transform: scaleY(var(--scale-factor));*/ /* Scale only vertically */
+        }
+    </style>
+</head>
+<body>
+    <canvas id="billiardTable" width="800" height="400"></canvas>
+
+    <div class="triangle" id="triangle"></div>
+
+    <script src="game.js"></script>
+</body>
+</html>
