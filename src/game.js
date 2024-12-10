@@ -109,8 +109,27 @@ function resolveCollision(ball1, ball2) {
     // Conservation of momentum for 1D elastic collision
     // instead of *1 it was dotProduct
     const collisionScale = 2 * 1 / (1 + 1); // Assuming equal mass for both balls
-    const impulseX = collisionScale * nx;
-    const impulseY = collisionScale * ny;
+    impulseX = collisionScale * nx;
+    impulseY = collisionScale * ny;
+
+
+
+    while (true) {
+        x = getRandomNumber(-Math.PI, Math.PI);
+        y = getRandomNumber(0, 50);
+    
+        if (y < probabilityDistribution(x, sigma)) {
+            break;
+        }
+    }
+
+    ball_dx_temp = impulseX * Math.cos(x) - impulseY * Math.sin(x);
+    ball_dy_temp = impulseX * Math.sin(x) + impulseY * Math.cos(x);
+
+    impulseX = ball_dx_temp;
+    impulseY = ball_dy_temp;
+
+
 
     // Update velocities
     ball1.dx -= impulseX;
@@ -303,22 +322,21 @@ function mouse_position() {
                 if (y < probabilityDistribution(x, sigma)) {
                     break;
                 }
-            }
-    
-            //console.log(probabilityDistribution(1, 1.5));
-            //console.log(getRandomNumber(-Math.PI, Math.PI));
-    
-    
+            }    
     
             degree = (180 / Math.PI) * x;
     
             console.log("print nums");
             console.log(degree);
+            console.log(x);
             console.log(ball.dx);
             console.log(ball.dy);
     
-            ball.dx = ball.dx * Math.cos(x) - ball.dy * Math.sin(x);
-            ball.dy = (ball.dx * Math.sin(x) + ball.dy * Math.cos(x));
+            ball_dx_temp = ball.dx * Math.cos(x) - ball.dy * Math.sin(x);
+            ball_dy_temp = ball.dx * Math.sin(x) + ball.dy * Math.cos(x);
+
+            ball.dx = ball_dx_temp;
+            ball.dy = ball_dy_temp;
 
             console.log(ball.dx);
             console.log(ball.dy);
