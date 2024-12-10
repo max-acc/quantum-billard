@@ -33,7 +33,7 @@ const pockets = [
 
 // Draw the Table
 function drawTable() {
-    ctx.fillStyle = "#228B22"; // Green surface
+    ctx.fillStyle = "#155843"; // Green surface
     ctx.fillRect(0, 0, tableWidth, tableHeight);
 
     // Draw Pockets
@@ -49,8 +49,8 @@ function drawTable() {
 function drawBalls() {
     if (whiteBallInGame == false && areBallsNotMoving()) {
         balls.unshift(whiteBall);
-        console.log("add wihte ball");
-        console.log(balls);
+        console.log("Add wihte ball");
+        //console.log(balls);
         whiteBallInGame = true;
         balls[0].dx = 0;
         balls[0].dy = 0;
@@ -165,7 +165,7 @@ function moveBalls() {
                     whiteBallInGame = false;
                 }
                 balls.splice(i, 1); // Remove the ball from the game   
-                console.log(balls);             
+                //console.log(balls);             
             }
         });
     }
@@ -192,10 +192,10 @@ function areBallsNotMoving() {
         tempDy += ball.dy;
     }
     if (tempDx == 0 && tempDy == 0) {
-        console.log("true");
+        //console.log("true");
         return true;
     } else {
-        console.log("false");
+        //console.log("false");
         return false;
     }
 }
@@ -259,38 +259,82 @@ function mouse_position() {
     //triangle.style.left = absBallPos.x + "px";
     //triangle.style.top = absBallPos.y + "px";
 
-
-    document.addEventListener('click', (event) => {
-        // Get the position of the click
-        mouseClickX = event.clientX;
-        mouseClickY = event.clientY;
+    if (areBallsNotMoving) {
+        document.addEventListener('click', (event) => {
+            // Get the position of the click
+            mouseClickX = event.clientX;
+            mouseClickY = event.clientY;
+        
+            //console.log(`Cursor clicked at: X=${mouseClickX}, Y=${mouseClickY}`);
     
-        //console.log(`Cursor clicked at: X=${mouseClickX}, Y=${mouseClickY}`);
+            triangle.style.visibility = "hidden";
+    
+            const ball = balls[0];
+    
+            ball.dx = -((mouseClickX - absBallPos.x) / 10);
+            ball.dy = -((mouseClickY - absBallPos.y) / 10);
+            
+            maxVelocity = 15;
 
-        triangle.style.visibility = "hidden";
+            // Both directions have to be scaled
+            if (Math.abs(ball.dx) > maxVelocity) {
+                if (ball.dx >= 0) {
+                    ball.dx = maxVelocity;
+                } else {
+                    ball.dx = -maxVelocity;
+                }
+            }
+            if (Math.abs(ball.dy) > maxVelocity) {
+                if (ball.dy >= 0) {
+                    ball.dy = maxVelocity;
+                } else {
+                    ball.dy = -maxVelocity;
+                }
+            }
 
-        const ball = balls[0];
+            velocity = Math.sqrt(Math.pow(ball.dx, 2) + Math.pow(ball.dy, 2), 2)
 
-        ball.dx = -((mouseClickX - absBallPos.x) / 10);
-        ball.dy = -((mouseClickY - absBallPos.y) / 10);
+            sigma = scaleValueRanges(velocity, 0, Math.sqrt(Math.pow(maxVelocity, 2) + Math.pow(maxVelocity, 2), 2), 0, Math.PI / 2);
+    
+            while (true) {
+                x = getRandomNumber(-Math.PI, Math.PI);
+                y = getRandomNumber(0, 50);
+            
+                if (y < probabilityDistribution(x, sigma)) {
+                    break;
+                }
+            }
+    
+            //console.log(probabilityDistribution(1, 1.5));
+            //console.log(getRandomNumber(-Math.PI, Math.PI));
+    
+    
+    
+            degree = (180 / Math.PI) * x;
+    
+            console.log("print nums");
+            console.log(degree);
+            console.log(ball.dx);
+            console.log(ball.dy);
+    
+            ball.dx = ball.dx * Math.cos(x) - ball.dy * Math.sin(x);
+            ball.dy = (ball.dx * Math.sin(x) + ball.dy * Math.cos(x));
 
-        if (ball.dx > 15) {
-            ball.dx = 15;
-        }
-        if (ball.dy > 15) {
-            ball.dy = 15;
-        }
-
-        if (mouseClickX < absBallPos.x) {
-            //ball.dx *=  -1;
-        } else {
-        }
-        if (mouseClickY < absBallPos.y) {
-            //ball.dx *=  -1;
-        } else {
-
-        }        
-    });
+            console.log(ball.dx);
+            console.log(ball.dy);
+    
+            if (mouseClickX < absBallPos.x) {
+                //ball.dx *=  -1;
+            } else {
+            }
+            if (mouseClickY < absBallPos.y) {
+                //ball.dx *=  -1;
+            } else {
+    
+            }        
+        });
+    }
+    
 
     
 
@@ -319,6 +363,14 @@ function gameLoop() {
         //console.log(Math.erf(4));
     }    
 }
+
+function gaussianDistribution(x, sigma) {
+    const coefficient = 1 / Math.sqrt(2 * Math.PI * Math.pow(sigma, 2))
+    const exponent = -(Math.pow(x, 2) / (2 * Math.pow(sigma, 2)));
+
+    return coefficient * Math.pow(Math.E, exponent);
+}
+
 function erf(x) {
     // Constants for the approximation
     const a1 = 0.254829592;
@@ -339,9 +391,18 @@ function erf(x) {
     return sign * y;
 }
 
-// Example usage:
-console.log(erf(0.2));  // Output: ~0.8427
-console.log(erf(-0.5));  // Output: ~0.9953
-console.log(erf(4)); // Output: ~-0.8427
+function probabilityDistribution(x, sigma) {
+    return (-(erf(Math.PI / (Math.sqrt(2) * sigma)) - 1)/(sigma * Math.PI)) + gaussianDistribution(x, sigma);
+}
+
+function getRandomNumber(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+function scaleValueRanges(number, inMin, inMax, outMin, outMax) {
+    return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+}
+
+
 // Start the Game
 gameLoop();
