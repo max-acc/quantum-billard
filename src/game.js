@@ -326,11 +326,11 @@ function mouse_position() {
     
             degree = (180 / Math.PI) * x;
     
-            console.log("print nums");
+            /*console.log("print nums");
             console.log(degree);
             console.log(x);
             console.log(ball.dx);
-            console.log(ball.dy);
+            console.log(ball.dy);*/
     
             ball_dx_temp = ball.dx * Math.cos(x) - ball.dy * Math.sin(x);
             ball_dy_temp = ball.dx * Math.sin(x) + ball.dy * Math.cos(x);
@@ -338,8 +338,8 @@ function mouse_position() {
             ball.dx = ball_dx_temp;
             ball.dy = ball_dy_temp;
 
-            console.log(ball.dx);
-            console.log(ball.dy);
+            //console.log(ball.dx);
+            //console.log(ball.dy);
     
             if (mouseClickX < absBallPos.x) {
                 //ball.dx *=  -1;
