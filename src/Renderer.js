@@ -138,7 +138,7 @@ export class Renderer {
     const length = Math.hypot(aim.x, aim.y) || 1
     const dir = { x: aim.x / length, y: aim.y / length } // cue sits behind the ball
     const gap = config.ballRadius + 6 + power * 220
-    const cueLength = 1000
+    const cueLength = 300
 
     // Draw in table coordinates, mapped onto the page.
     const dpr = window.devicePixelRatio || 1
