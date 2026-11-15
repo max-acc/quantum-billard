@@ -3,7 +3,8 @@ import globals from 'globals'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist', 'src']) // legacy code, linted again after the refactor,
+  // src is legacy code and gets linted again after the refactor
+  globalIgnores(['dist', 'src']),
   {
     files: ['**/*.js'],
     extends: [js.configs.recommended],
