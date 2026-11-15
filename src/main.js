@@ -5,8 +5,10 @@ import { Renderer } from './Renderer.js'
 
 const canvas = document.getElementById('billiardTable')
 
+const overlay = document.getElementById('cueLayer')
+
 const game = new Game()
-const renderer = new Renderer(canvas, game)
+const renderer = new Renderer(canvas, overlay, game)
 const input = new Input(canvas, renderer, game)
 
 function frame() {
