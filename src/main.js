@@ -4,16 +4,19 @@ import { Input } from './Input.js'
 import { Renderer } from './Renderer.js'
 
 const canvas = document.getElementById('billiardTable')
-const indicator = document.getElementById('aimIndicator')
+
+const overlay = document.getElementById('cueLayer')
 
 const game = new Game()
-const renderer = new Renderer(canvas, game)
-const input = new Input(canvas, indicator, game)
+const renderer = new Renderer(canvas, overlay, game)
+const input = new Input(canvas, renderer, game)
 
 function frame() {
   game.update()
+  renderer.setAim(
+    input.canAim ? { aim: input.aim, power: game.previewShot(input.aim).power } : null,
+  )
   renderer.draw()
-  input.update()
   requestAnimationFrame(frame)
 }
 

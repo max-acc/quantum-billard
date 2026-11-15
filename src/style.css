@@ -1,28 +1,48 @@
+:root {
+  --bg: #111;
+  --text: #ddd;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  font-family: Arial, sans-serif;
-  background-color: #0a0a0a;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px;
+  font-family: system-ui, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.table-wrap {
+  width: min(100%, 960px);
 }
 
 canvas {
   display: block;
-  border: 10px solid #228b22;
-  background-color: #155843;
+  width: 100%;
+  aspect-ratio: 880 / 480;
+  cursor: crosshair;
+  touch-action: none;
 }
 
-.aim-indicator {
+#cueLayer {
   position: fixed;
-  top: 0;
-  left: 0;
-  visibility: hidden;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
   pointer-events: none;
-  width: 0;
-  height: 0;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-bottom: 10px solid white;
 }
