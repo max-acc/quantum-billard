@@ -1,8 +1,6 @@
 :root {
-  --bg: #07090d;
-  --text: #e6edf3;
-  --muted: #8b98a5;
-  --accent: #5eead4;
+  --bg: #111;
+  --text: #ddd;
 }
 
 * {
@@ -16,48 +14,21 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 16px;
   padding: 16px;
-  font-family:
-    'Inter',
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    sans-serif;
+  font-family: system-ui, sans-serif;
   color: var(--text);
-  background:
-    radial-gradient(900px 500px at 50% 0%, rgba(94, 234, 212, 0.1), transparent 70%),
-    radial-gradient(700px 400px at 100% 100%, rgba(139, 92, 246, 0.1), transparent 70%), var(--bg);
+  background: var(--bg);
 }
 
-.header {
-  text-align: center;
-}
-
-.header h1 {
+h1 {
   margin: 0;
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  background: linear-gradient(90deg, var(--accent), #a78bfa);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.header p,
-.hint {
-  margin: 4px 0 0;
-  color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .table-wrap {
   width: min(100%, 960px);
-  border-radius: 28px;
-  box-shadow:
-    0 30px 80px rgba(0, 0, 0, 0.6),
-    0 0 60px rgba(94, 234, 212, 0.08);
 }
 
 canvas {
