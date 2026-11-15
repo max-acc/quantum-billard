@@ -1,13 +1,13 @@
 import js from '@eslint/js'
 import globals from 'globals'
+import prettier from 'eslint-config-prettier'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  // src is legacy code and gets linted again after the refactor
-  globalIgnores(['dist', 'src']),
+  globalIgnores(['dist']),
   {
     files: ['**/*.js'],
-    extends: [js.configs.recommended],
+    extends: [js.configs.recommended, prettier],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
