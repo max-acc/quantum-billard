@@ -1,47 +1,35 @@
-/** Aiming indicator and shooting; listeners are registered exactly once. */
+/** Tracks the cursor in table coordinates and turns clicks into shots. */
 export class Input {
-  constructor(canvas, indicator, game) {
+  constructor(canvas, renderer, game) {
     this.canvas = canvas
-    this.indicator = indicator
+    this.renderer = renderer
     this.game = game
     this.cursor = null
 
-    document.addEventListener('mousemove', (event) => {
-      this.cursor = { x: event.clientX, y: event.clientY }
-    })
+    document.addEventListener('mousemove', (event) => this.#track(event))
     document.addEventListener('click', (event) => {
-      this.cursor = { x: event.clientX, y: event.clientY }
-      this.game.shoot(this.#aimVector())
+      this.#track(event)
+      if (this.canAim) this.game.shoot(this.aim)
+    })
+    document.addEventListener('touchstart', (event) => this.#track(event.touches[0]), {
+      passive: true,
+    })
+    document.addEventListener('touchmove', (event) => this.#track(event.touches[0]), {
+      passive: true,
     })
   }
 
-  /** Call once per frame to keep the indicator in sync with the game. */
-  update() {
-    const visible = this.cursor && this.game.whiteInGame && this.game.areBallsAtRest
-    this.indicator.style.visibility = visible ? 'visible' : 'hidden'
-    if (!visible) return
-
-    const origin = this.#ballPosition()
-    const aim = this.#aimVector()
-    // The indicator sits opposite the cursor, pointing in the shot direction.
-    const x = origin.x - aim.x / 2
-    const y = origin.y - aim.y / 2
-    const angle = Math.atan2(aim.y, aim.x) + Math.PI / 2 + Math.PI
-    this.indicator.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%) rotate(${angle}rad)`
+  get canAim() {
+    return this.cursor !== null && this.game.whiteInGame && this.game.areBallsAtRest
   }
 
-  /** White ball centre in page coordinates (inside the canvas border). */
-  #ballPosition() {
-    const rect = this.canvas.getBoundingClientRect()
+  /** Vector from the white ball to the cursor in table coordinates. */
+  get aim() {
     const { whiteBall } = this.game
-    return {
-      x: rect.left + this.canvas.clientLeft + whiteBall.x,
-      y: rect.top + this.canvas.clientTop + whiteBall.y,
-    }
+    return { x: this.cursor.x - whiteBall.x, y: this.cursor.y - whiteBall.y }
   }
 
-  #aimVector() {
-    const origin = this.#ballPosition()
-    return { x: this.cursor.x - origin.x, y: this.cursor.y - origin.y }
+  #track({ clientX, clientY }) {
+    this.cursor = this.renderer.toTable(clientX, clientY)
   }
 }

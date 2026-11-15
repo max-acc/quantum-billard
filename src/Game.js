@@ -32,19 +32,28 @@ export class Game {
   shoot(aim) {
     if (!this.whiteInGame || !this.areBallsAtRest) return
 
-    const { maxVelocity, shotScale } = this.config
     const ball = this.whiteBall
-    ball.dx = clamp(-aim.x / shotScale, maxVelocity)
-    ball.dy = clamp(-aim.y / shotScale, maxVelocity)
+    const { dx, dy } = this.previewShot(aim)
+    ball.dx = dx
+    ball.dy = dy
 
-    const speed = Math.hypot(ball.dx, ball.dy)
-    const maxSpeed = Math.hypot(maxVelocity, maxVelocity)
+    const speed = Math.hypot(dx, dy)
+    const maxSpeed = Math.hypot(this.config.maxVelocity, this.config.maxVelocity)
     this.physics.sigma = scaleRange(speed, 0, maxSpeed, 0, Math.PI / 2)
     if (this.physics.sigma === 0) return // no shot, nothing to deviate
 
     const deviated = rotate(ball.dx, ball.dy, sampleDeviation(this.physics.sigma))
     ball.dx = deviated.x
     ball.dy = deviated.y
+  }
+
+  /** Velocity and normalised power (0..1) a shot with this aim vector would have. */
+  previewShot(aim) {
+    const { maxVelocity, shotScale } = this.config
+    const dx = clamp(-aim.x / shotScale, maxVelocity)
+    const dy = clamp(-aim.y / shotScale, maxVelocity)
+    const power = Math.hypot(dx, dy) / Math.hypot(maxVelocity, maxVelocity)
+    return { dx, dy, power }
   }
 
   #respawnWhite() {
