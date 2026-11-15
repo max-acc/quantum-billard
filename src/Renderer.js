@@ -12,15 +12,19 @@ const PALETTE = {
 }
 
 export class Renderer {
-  constructor(canvas, game) {
+  /** `overlay` is a full-window canvas on top of the table, so the cue is never clipped. */
+  constructor(canvas, overlay, game) {
     this.canvas = canvas
     this.ctx = canvas.getContext('2d')
+    this.overlay = overlay
+    this.overlayCtx = overlay.getContext('2d')
     this.game = game
     this.logicalWidth = game.table.width + RAIL * 2
     this.logicalHeight = game.table.height + RAIL * 2
     this.aimState = null
 
     new ResizeObserver(() => this.#resize()).observe(canvas)
+    window.addEventListener('resize', () => this.#resize())
     this.#resize()
   }
 
@@ -50,8 +54,10 @@ export class Renderer {
     this.#drawPockets()
     if (this.aimState) this.#drawAimLine()
     this.#drawBalls()
-    if (this.aimState) this.#drawCue()
+    if (this.aimState) this.#drawPowerMeter()
     ctx.restore()
+
+    this.#drawCue()
   }
 
   #resize() {
@@ -60,6 +66,8 @@ export class Renderer {
     this.canvas.width = Math.round(rect.width * dpr)
     this.canvas.height = Math.round(rect.height * dpr)
     this.scale = this.canvas.width / this.logicalWidth
+    this.overlay.width = Math.round(window.innerWidth * dpr)
+    this.overlay.height = Math.round(window.innerHeight * dpr)
     this.draw() // resizing clears the canvas, so repaint right away
   }
 
@@ -120,29 +128,40 @@ export class Renderer {
   }
 
   #drawCue() {
-    const { ctx } = this
+    const { overlayCtx: ctx, overlay } = this
+    ctx.setTransform(1, 0, 0, 1, 0, 0)
+    ctx.clearRect(0, 0, overlay.width, overlay.height)
+    if (!this.aimState) return
+
     const { whiteBall, config } = this.game
     const { aim, power } = this.aimState
     const length = Math.hypot(aim.x, aim.y) || 1
     const dir = { x: aim.x / length, y: aim.y / length } // cue sits behind the ball
     const gap = config.ballRadius + 6 + power * 220
-    const cueLength = 420
+    const cueLength = 1000
 
-    ctx.save()
+    // Draw in table coordinates, mapped onto the page.
+    const dpr = window.devicePixelRatio || 1
+    const rect = this.canvas.getBoundingClientRect()
+    const k = (rect.width / this.logicalWidth) * dpr
+    ctx.setTransform(k, 0, 0, k, rect.left * dpr + RAIL * k, rect.top * dpr + RAIL * k)
+
     ctx.translate(whiteBall.x + dir.x * gap, whiteBall.y + dir.y * gap)
     ctx.rotate(Math.atan2(dir.y, dir.x))
-
     ctx.fillStyle = '#d9b77e'
     ctx.fillRect(0, -3, cueLength, 6)
-    ctx.restore()
+  }
 
-    // power meter under the cue
+  #drawPowerMeter() {
+    const { ctx } = this
+    const { whiteBall, config } = this.game
+    const { power } = this.aimState
     const meterX = whiteBall.x - 24
     const meterY = whiteBall.y + config.ballRadius + 16
     ctx.fillStyle = 'rgba(0, 0, 0, 0.45)'
     roundRect(ctx, meterX, meterY, 48, 5, 2.5)
     ctx.fill()
-    ctx.fillStyle = `#ffffff`
+    ctx.fillStyle = '#ffffff'
     roundRect(ctx, meterX, meterY, Math.max(5, 48 * power), 5, 2.5)
     ctx.fill()
   }
