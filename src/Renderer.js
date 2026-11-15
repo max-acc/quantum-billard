@@ -138,18 +138,26 @@ export class Renderer {
     const length = Math.hypot(aim.x, aim.y) || 1
     const dir = { x: aim.x / length, y: aim.y / length } // cue sits behind the ball
     const gap = config.ballRadius + 6 + power * 220
-    const cueLength = 300
+    const cueLength = 200
 
-    // Draw in table coordinates, mapped onto the page.
+    // Table coordinates -> page pixels (the overlay covers the whole window).
     const dpr = window.devicePixelRatio || 1
     const rect = this.canvas.getBoundingClientRect()
     const k = (rect.width / this.logicalWidth) * dpr
-    ctx.setTransform(k, 0, 0, k, rect.left * dpr + RAIL * k, rect.top * dpr + RAIL * k)
+    const toPage = (distance) => ({
+      x: rect.left * dpr + (RAIL + whiteBall.x + dir.x * distance) * k,
+      y: rect.top * dpr + (RAIL + whiteBall.y + dir.y * distance) * k,
+    })
+    const tip = toPage(gap)
+    const butt = toPage(gap + cueLength)
 
-    ctx.translate(whiteBall.x + dir.x * gap, whiteBall.y + dir.y * gap)
-    ctx.rotate(Math.atan2(dir.y, dir.x))
-    ctx.fillStyle = '#d9b77e'
-    ctx.fillRect(0, -3, cueLength, 6)
+    ctx.strokeStyle = '#d9b77e'
+    ctx.lineWidth = 6 * k
+    ctx.lineCap = 'butt'
+    ctx.beginPath()
+    ctx.moveTo(tip.x, tip.y)
+    ctx.lineTo(butt.x, butt.y)
+    ctx.stroke()
   }
 
   #drawPowerMeter() {
