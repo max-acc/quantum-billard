@@ -125,8 +125,8 @@ export class Renderer {
     const { aim, power } = this.aimState
     const length = Math.hypot(aim.x, aim.y) || 1
     const dir = { x: aim.x / length, y: aim.y / length } // cue sits behind the ball
-    const gap = config.ballRadius + 6 + power * 60
-    const cueLength = 260
+    const gap = config.ballRadius + 6 + power * 220
+    const cueLength = 420
 
     ctx.save()
     ctx.translate(whiteBall.x + dir.x * gap, whiteBall.y + dir.y * gap)
